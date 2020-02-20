@@ -13,8 +13,8 @@ public final class Main
 	private final boolean showFPS = true;
 	private final boolean fullscreen = false;
 		
-	private float[] buffer;
-	private float[] toDraw;
+	private int[] buffer;
+	private int[] toDraw;
 	private boolean valid = false;
 	
 	private double x = -0.5f;
@@ -82,7 +82,7 @@ public final class Main
 				
 				if(!valid)
 				{
-					buffer = new float[getWidth() * getHeight()];
+					buffer = new int[getWidth() * getHeight()];
 				
 					double ratio = getWidth() * 1.0 / getHeight();
 					
@@ -106,7 +106,7 @@ public final class Main
 				for(int y = 0; y < getHeight(); y++)
 					for(int x = 0; x < getWidth(); x++)
 					{						
-						int value = (int)(toDraw[x + y * getWidth()]);
+						int value = toDraw[x + y * getWidth()];
 						drawPixel(x, y, (byte)((value >> 16)&0xff), (byte)((value >> 8)&0xff), (byte)(value&0xff));
 					}
 				
@@ -115,7 +115,7 @@ public final class Main
 			}			
 		};
 		
-		toDraw = new float[fe.getWidth() * fe.getHeight()];
+		toDraw = new int[fe.getWidth() * fe.getHeight()];
 		
 		s1 = new Solver();
 		s2 = new Solver();
