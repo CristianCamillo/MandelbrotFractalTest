@@ -17,9 +17,9 @@ public final class Main
 	private float[] toDraw;
 	private boolean valid = false;
 	
-	private float x = -0.5f;
-	private float y = 0f;
-	private float zoom = 1f;
+	private double x = -0.5f;
+	private double y = 0f;
+	private double zoom = 1f;
 	
 	private Solver s1;
 	private Solver s2;
@@ -45,14 +45,20 @@ public final class Main
 					valid = false;
 				}
 				
-				float checkZoom = zoom;
-				float checkX = x;
-				float checkY = y;
+				double checkZoom = zoom;
+				double checkX = x;
+				double checkY = y;
 				
 				if(key(KeyEvent.VK_W))
 					zoom += elapsedTime * zoom;
 				if(key(KeyEvent.VK_S))
+				{
 					zoom -= elapsedTime * zoom;
+					if(zoom <= 0.1f)
+						zoom = 0.1f;
+				}
+				
+			//	System.out.println(zoom);
 				
 				if(key(KeyEvent.VK_UP))
 					y -= elapsedTime / zoom;
@@ -78,21 +84,16 @@ public final class Main
 				{
 					buffer = new float[getWidth() * getHeight()];
 				
-					float ratio = getWidth() * 1f / getHeight();
+					double ratio = getWidth() * 1.0 / getHeight();
 					
-					float[] reals = linearSpace(- ratio / zoom + x, ratio / zoom + x, getWidth());
+					double[] reals = linearSpace(- ratio * 1.0 / zoom + x, ratio * 1.0 / zoom + x, getWidth());
 					
-					float[] imags = linearSpace(-1f / zoom + y, 1f / zoom + y, getHeight());
+					double[] imags = linearSpace(- 1.0 / zoom + y, 1.0 / zoom + y, getHeight());
 					
 					s1.setData(0, 			   0, 			    getWidth() / 2, getHeight() / 2, getWidth(), reals, imags, buffer);
 					s2.setData(getWidth() / 2, 0, 			    getWidth(),     getHeight() / 2, getWidth(), reals, imags, buffer);
 					s3.setData(0, 			   getHeight() / 2, getWidth() / 2, getHeight(),     getWidth(), reals, imags, buffer);
 					s4.setData(getWidth() / 2, getHeight() / 2, getWidth(),     getHeight(),     getWidth(), reals, imags, buffer);
-
-					// remove if enabling multithread
-//					for(int y = 0; y < getHeight(); y++)
-	//					for(int x = 0; x < getWidth(); x++)
-		//					toDraw[x + y * getWidth()] = mandelbrot(reals[x], imags[y], 100);
 					
 					valid = true;
 				}
@@ -105,7 +106,7 @@ public final class Main
 				for(int y = 0; y < getHeight(); y++)
 					for(int x = 0; x < getWidth(); x++)
 					{						
-						int value = (int)(normalize(toDraw[x + y * getWidth()], 100) * 255 + 0.5f);
+						int value = (int)(toDraw[x + y * getWidth()] + 0.5f);
 						drawPixel(x, y, (byte)((value >> 16)&0xff), (byte)((value >> 8)&0xff), (byte)(value&0xff));
 					}
 				
@@ -137,24 +138,9 @@ public final class Main
 		s2.stop();
 		s3.stop();
 		s4.stop();
-	}	
-	
-	private int mandelbrot(float real, float imag, int maxIter)
-	{
-		Complex c = new Complex(real, imag);
-		Complex z = new Complex(0, 0);
-		
-		for(int i = 0; i < maxIter; i++)
-		{
-			z = z.times(z).plus(c);
-			if(z.re() * z.re() + z.im() * z.im() >= 4)
-				return i;
-		}
-		
-		return maxIter;
 	}
 	
-	private float[] linearSpace(float start, float end, int intervals)
+	/*private float[] linearSpace(float start, float end, int intervals)
 	{
 		if(intervals == 0)
 			throw new IllegalArgumentException("Number of intervals cannot be 0");
@@ -162,6 +148,21 @@ public final class Main
 		float[] result = new float[intervals];
 		
 		float step = (end - start) / (intervals - 1);
+		
+		for(int i = 0; i < intervals; i++)
+			result[i] = start + i * step;
+		
+		return result;
+	}*/
+	
+	private double[] linearSpace(double start, double end, int intervals)
+	{
+		if(intervals == 0)
+			throw new IllegalArgumentException("Number of intervals cannot be 0");
+		
+		double[] result = new double[intervals];
+		
+		double step = (end - start) / (intervals - 1);
 		
 		for(int i = 0; i < intervals; i++)
 			result[i] = start + i * step;
