@@ -99,11 +99,7 @@ public class Solver implements Runnable
 			zImag = newImag;
 			
 			if(zReal * zReal + zImag * zImag >= 4)
-			{
-				//if(i > 100)
-				//	System.out.println(i);
 				return i;			
-			}
 		}
 		
 		return maxIter;
