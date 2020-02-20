@@ -11,7 +11,7 @@ public class Solver implements Runnable
 	private double[] reals;
 	private double[] imags;
 	
-	private float[] buffer;
+	private int[] buffer;
 	
 	private boolean running;	
 	private boolean updated;
@@ -28,7 +28,7 @@ public class Solver implements Runnable
 	public boolean isUpdated() { return updated; }
 	public boolean isRunning() { return running; }
 	
-	public void setData(int xStart, int yStart, int xEnd, int yEnd, int width, double[] reals, double[] imags, float[] buffer)
+	public void setData(int xStart, int yStart, int xEnd, int yEnd, int width, double[] reals, double[] imags, int[] buffer)
 	{
 		abort = true;
 		
@@ -99,7 +99,7 @@ public class Solver implements Runnable
 			zImag = newImag;
 			
 			if(zReal * zReal + zImag * zImag >= 4)
-				return i;			
+				return i;
 		}
 		
 		return maxIter;
