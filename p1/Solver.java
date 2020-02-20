@@ -8,8 +8,8 @@ public class Solver implements Runnable
 	private int yEnd;
 	private int width;
 	
-	private float[] reals;
-	private float[] imags;
+	private double[] reals;
+	private double[] imags;
 	
 	private float[] buffer;
 	
@@ -28,7 +28,7 @@ public class Solver implements Runnable
 	public boolean isUpdated() { return updated; }
 	public boolean isRunning() { return running; }
 	
-	public void setData(int xStart, int yStart, int xEnd, int yEnd, int width, float[] reals, float[] imags, float[] buffer)
+	public void setData(int xStart, int yStart, int xEnd, int yEnd, int width, double[] reals, double[] imags, float[] buffer)
 	{
 		abort = true;
 		
@@ -70,11 +70,11 @@ public class Solver implements Runnable
 					for(y = yStart; y < yEnd; y++)
 						for(x = xStart; x < xEnd; x++)
 							if(!abort)
-								buffer[x + y * width] = mandelbrot(reals[x], imags[y], 100);
+								buffer[x + y * width] = mandelbrot(reals[x], imags[y], 255);
 							else
 							{
 								x = xEnd;
-								y = yEnd;								
+								y = yEnd;
 							}
 					
 					updated = true;
@@ -82,16 +82,28 @@ public class Solver implements Runnable
 		}
 	}
 	
-	private int mandelbrot(float real, float imag, int maxIter)
+	private static int mandelbrot(double real, double imag, int maxIter)
 	{
-		Complex c = new Complex(real, imag);
-		Complex z = new Complex(0, 0);
+		double cReal = real;
+		double cImag = imag;
+		
+		double zReal = 0;
+		double zImag = 0;
 		
 		for(int i = 0; i < maxIter; i++)
 		{
-			z = z.times(z).plus(c);
-			if(z.re() * z.re() + z.im() * z.im() >= 4)
-				return i;
+			double newReal = zReal * zReal - zImag * zImag + cReal;
+			double newImag = zReal * zImag + zImag * zReal + cImag;
+			
+			zReal = newReal;
+			zImag = newImag;
+			
+			if(zReal * zReal + zImag * zImag >= 4)
+			{
+				//if(i > 100)
+				//	System.out.println(i);
+				return i;			
+			}
 		}
 		
 		return maxIter;
