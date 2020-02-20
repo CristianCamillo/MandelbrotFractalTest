@@ -39,6 +39,12 @@ public final class Main
 				if(keyToggle(KeyEvent.VK_F1))
 					setFPSCap(getFPSCap() == 0 ? FPSCap : 0);
 				
+				if(keyToggle(KeyEvent.VK_F2))
+				{
+					setSize(width, height, !isFullscreen());
+					valid = false;
+				}
+				
 				float checkZoom = zoom;
 				float checkX = x;
 				float checkY = y;
