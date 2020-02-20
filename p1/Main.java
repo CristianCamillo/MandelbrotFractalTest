@@ -106,7 +106,7 @@ public final class Main
 				for(int y = 0; y < getHeight(); y++)
 					for(int x = 0; x < getWidth(); x++)
 					{						
-						int value = (int)(toDraw[x + y * getWidth()] + 0.5f);
+						int value = (int)(toDraw[x + y * getWidth()]);
 						drawPixel(x, y, (byte)((value >> 16)&0xff), (byte)((value >> 8)&0xff), (byte)(value&0xff));
 					}
 				
