@@ -140,21 +140,6 @@ public final class Main
 		s4.stop();
 	}
 	
-	/*private float[] linearSpace(float start, float end, int intervals)
-	{
-		if(intervals == 0)
-			throw new IllegalArgumentException("Number of intervals cannot be 0");
-		
-		float[] result = new float[intervals];
-		
-		float step = (end - start) / (intervals - 1);
-		
-		for(int i = 0; i < intervals; i++)
-			result[i] = start + i * step;
-		
-		return result;
-	}*/
-	
 	private double[] linearSpace(double start, double end, int intervals)
 	{
 		if(intervals == 0)
@@ -168,10 +153,5 @@ public final class Main
 			result[i] = start + i * step;
 		
 		return result;
-	}
-	
-	private float normalize(float value, float maxValue)
-	{
-		return value / maxValue;
 	}
 }
