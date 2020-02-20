@@ -107,7 +107,10 @@ public final class Main
 					{						
 						int value = (int)(normalize(toDraw[x + y * getWidth()], 100) * 255 + 0.5f);
 						drawPixel(x, y, (byte)((value >> 16)&0xff), (byte)((value >> 8)&0xff), (byte)(value&0xff));
-					}				
+					}
+				
+				g.setColor(Color.RED);
+				g.drawString(getFPS() + "", 10, 20);
 			}			
 		};
 		
