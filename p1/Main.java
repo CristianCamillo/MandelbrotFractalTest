@@ -3,6 +3,7 @@ package p1;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -77,26 +78,25 @@ public final class Main
 			
 			@Override
 			public void render(Graphics g, byte[] frameBuffer)
-			{
-				g.setColor(Color.WHITE);
-				g.fillRect(- getWidth() / 2, - getHeight() / 2, getWidth(), getHeight());
-				
+			{				
 				if(!valid)
 				{
-					buffer = new int[getWidth() * getHeight()];
+					if(buffer.length != getWidth() * getHeight())
+						buffer = new int[getWidth() * getHeight()];
 				
 					double ratio = getWidth() * 1.0 / getHeight();
-					
-					double[] reals = linearSpace(- ratio * 1.0 / zoom + x, ratio * 1.0 / zoom + x, getWidth());
-					
-					double[] imags = linearSpace(- 1.0 / zoom + y, 1.0 / zoom + y, getHeight());
-					
+
+					double[] reals = linearSpace(- ratio * 1.0 / zoom + x, ratio * 1.0 / zoom + x, getWidth());					
+					double[] imags = linearSpace(- 1.0 / zoom + y, 1f / zoom + y, getHeight());
+			
 					for(int i = 0; i < N_SOLVER; i++)
 					{
 						int height = getHeight() / N_SOLVER;
 						s[i].setData(0, height * i, getWidth(), height * (i + 1), getWidth(), reals, imags, buffer);
 					}
-					/*SimpleSolver ss1 = new SimpleSolver(0, 			    0, 			     getWidth() / 2, getHeight() / 2, getWidth(), reals, imags, buffer);
+					
+					
+				/*	SimpleSolver ss1 = new SimpleSolver(0, 			    0, 			     getWidth() / 2, getHeight() / 2, getWidth(), reals, imags, buffer);
 					SimpleSolver ss2 = new SimpleSolver(getWidth() / 2, 0, 			     getWidth(),     getHeight() / 2, getWidth(), reals, imags, buffer);
 					SimpleSolver ss3 = new SimpleSolver(0, 			    getHeight() / 2, getWidth() / 2, getHeight(),     getWidth(), reals, imags, buffer);
 					SimpleSolver ss4 = new SimpleSolver(getWidth() / 2, getHeight() / 2, getWidth(),     getHeight(),     getWidth(), reals, imags, buffer);
@@ -108,16 +108,12 @@ public final class Main
 					
 					valid = true;
 				}
-				
-				
-				// use if you don't want the frame chopped
-			//	if(s1.isUpdated() && s2.isUpdated() && s3.isUpdated() && s4.isUpdated())
-					toDraw = buffer;
+								
 				
 				for(int y = 0; y < getHeight(); y++)
 					for(int x = 0; x < getWidth(); x++)
 					{						
-						int value = toDraw[x + y * getWidth()];
+						int value = buffer[x + y * getWidth()];
 						drawPixel(x, y, (byte)((value >> 16)&0xff), (byte)((value >> 8)&0xff), (byte)(value&0xff));
 					}
 				
@@ -130,9 +126,11 @@ public final class Main
 			}			
 		};
 		
-		toDraw = new int[fe.getWidth() * fe.getHeight()];
+		/*executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
+		executor.allowCoreThreadTimeOut(false);
+		executor.*/
 		
-		//executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+		buffer = new int[fe.getWidth() * fe.getHeight()];
 		
 		s = new Solver[N_SOLVER];
 		for(int i = 0; i < N_SOLVER; i++)
@@ -144,33 +142,13 @@ public final class Main
 		
 		for(int i = 0; i < N_SOLVER; i++)
 			t[i].start();
-		
-		/*s1 = new Solver();
-		s2 = new Solver();
-		s3 = new Solver();
-		s4 = new Solver();
-		
-		Thread t1 = new Thread(s1);
-		Thread t2 = new Thread(s2);
-		Thread t3 = new Thread(s3);
-		Thread t4 = new Thread(s4);		
-		
-		t1.start();
-		t2.start();
-		t3.start();
-		t4.start();*/
 						
 		fe.start();
 		
 		for(int i = 0; i < N_SOLVER; i++)
 			s[i].stop();
 		
-	//	executor.shutdown();
-		
-		/*s1.stop();
-		s2.stop();
-		s3.stop();
-		s4.stop();*/
+		//executor.shutdown();
 	}
 	
 	private static double[] linearSpace(double start, double end, int intervals)
