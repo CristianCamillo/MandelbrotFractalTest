@@ -3,6 +3,8 @@ package p1;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public final class Main
 {	
@@ -21,10 +23,11 @@ public final class Main
 	private double y = 0f;
 	private double zoom = 1f;
 	
-	private Solver s1;
-	private Solver s2;
-	private Solver s3;
-	private Solver s4;
+	private Solver[] s;
+	
+	private final static int N_SOLVER = 4;
+	
+	private ThreadPoolExecutor executor;
 	
 	public Main()
 	{						
@@ -58,8 +61,6 @@ public final class Main
 						zoom = 0.1f;
 				}
 				
-			//	System.out.println(zoom);
-				
 				if(key(KeyEvent.VK_UP))
 					y -= elapsedTime / zoom;
 				if(key(KeyEvent.VK_DOWN))
@@ -90,10 +91,20 @@ public final class Main
 					
 					double[] imags = linearSpace(- 1.0 / zoom + y, 1.0 / zoom + y, getHeight());
 					
-					s1.setData(0, 			   0, 			    getWidth() / 2, getHeight() / 2, getWidth(), reals, imags, buffer);
-					s2.setData(getWidth() / 2, 0, 			    getWidth(),     getHeight() / 2, getWidth(), reals, imags, buffer);
-					s3.setData(0, 			   getHeight() / 2, getWidth() / 2, getHeight(),     getWidth(), reals, imags, buffer);
-					s4.setData(getWidth() / 2, getHeight() / 2, getWidth(),     getHeight(),     getWidth(), reals, imags, buffer);
+					for(int i = 0; i < N_SOLVER; i++)
+					{
+						int height = getHeight() / N_SOLVER;
+						s[i].setData(0, height * i, getWidth(), height * (i + 1), getWidth(), reals, imags, buffer);
+					}
+					/*SimpleSolver ss1 = new SimpleSolver(0, 			    0, 			     getWidth() / 2, getHeight() / 2, getWidth(), reals, imags, buffer);
+					SimpleSolver ss2 = new SimpleSolver(getWidth() / 2, 0, 			     getWidth(),     getHeight() / 2, getWidth(), reals, imags, buffer);
+					SimpleSolver ss3 = new SimpleSolver(0, 			    getHeight() / 2, getWidth() / 2, getHeight(),     getWidth(), reals, imags, buffer);
+					SimpleSolver ss4 = new SimpleSolver(getWidth() / 2, getHeight() / 2, getWidth(),     getHeight(),     getWidth(), reals, imags, buffer);
+					
+					executor.execute(ss1);
+					executor.execute(ss2);
+					executor.execute(ss3);
+					executor.execute(ss4);*/
 					
 					valid = true;
 				}
@@ -112,12 +123,29 @@ public final class Main
 				
 				g.setColor(Color.RED);
 				g.drawString(getFPS() + "", 10, 20);
+				
+				g.drawString("x = " + x, 10, 40);
+				g.drawString("y = " + y, 10, 60);
+				g.drawString("zoom = " + zoom, 10, 80);
 			}			
 		};
 		
 		toDraw = new int[fe.getWidth() * fe.getHeight()];
 		
-		s1 = new Solver();
+		//executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+		
+		s = new Solver[N_SOLVER];
+		for(int i = 0; i < N_SOLVER; i++)
+			s[i] = new Solver();
+		
+		Thread[] t = new Thread[N_SOLVER];
+		for(int i = 0; i < N_SOLVER; i++)
+			t[i] = new Thread(s[i]);
+		
+		for(int i = 0; i < N_SOLVER; i++)
+			t[i].start();
+		
+		/*s1 = new Solver();
 		s2 = new Solver();
 		s3 = new Solver();
 		s4 = new Solver();
@@ -130,17 +158,22 @@ public final class Main
 		t1.start();
 		t2.start();
 		t3.start();
-		t4.start();
+		t4.start();*/
 						
 		fe.start();
 		
-		s1.stop();
+		for(int i = 0; i < N_SOLVER; i++)
+			s[i].stop();
+		
+	//	executor.shutdown();
+		
+		/*s1.stop();
 		s2.stop();
 		s3.stop();
-		s4.stop();
+		s4.stop();*/
 	}
 	
-	private double[] linearSpace(double start, double end, int intervals)
+	private static double[] linearSpace(double start, double end, int intervals)
 	{
 		if(intervals == 0)
 			throw new IllegalArgumentException("Number of intervals cannot be 0");
