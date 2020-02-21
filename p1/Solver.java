@@ -18,8 +18,10 @@ public class Solver implements Runnable
 	
 	private volatile boolean abort;
 	
+	private final static int ITERATIONS = 1024;
+	
 	public Solver()
-	{
+	{		
 		running = false;
 		updated = false;
 		abort = false;
@@ -70,7 +72,7 @@ public class Solver implements Runnable
 					for(y = yStart; y < yEnd; y++)
 						for(x = xStart; x < xEnd; x++)
 							if(!abort)
-								buffer[x + y * width] = mandelbrot(reals[x], imags[y], 255);
+								buffer[x + y * width] = mandelbrot(reals[x], imags[y], ITERATIONS);
 							else
 							{
 								x = xEnd;
